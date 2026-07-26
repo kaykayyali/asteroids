@@ -77,6 +77,21 @@
     return Math.hypot(shortestX, shortestY);
   }
 
+  function toroidalVector(from, to) {
+    let x = to.x - from.x;
+    let y = to.y - from.y;
+
+    if (Math.abs(x) > width() / 2) {
+      x -= Math.sign(x) * width();
+    }
+
+    if (Math.abs(y) > height() / 2) {
+      y -= Math.sign(y) * height();
+    }
+
+    return { x, y };
+  }
+
   // Resizing updates the backing store and wraps paused entities immediately, not next tick.
   function resize() {
     pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
@@ -328,8 +343,13 @@
       return;
     }
 
+    const target = enemy ? toroidalVector(ufo, ship) : null;
+    const leadTime = enemy && ufo.radius < 15 ? 0.5 : 0;
     const angle = enemy
-      ? Math.atan2(ship.y - ufo.y, ship.x - ufo.x) + random(-0.25, 0.25)
+      ? Math.atan2(
+        target.y + ship.vy * leadTime,
+        target.x + ship.vx * leadTime,
+      ) + random(-0.25, 0.25)
       : ship.angle;
     const speed = enemy ? 210 : 460;
     const list = enemy ? enemyBullets : bullets;

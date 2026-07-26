@@ -73,3 +73,7 @@ Ran `node --check` over every JavaScript file and a whitespace/line-length check
 ## 2026-07-26 — iteration 13: rapid-hit score combos
 
 Added a 1.8-second escalating asteroid-hit combo, capped at five times the base score, with a HUD readout. It rewards confidently clearing an active debris cluster rather than camping at the edge. I kept UFO rewards fixed so their high-value, intermittent role remains understandable.
+
+## 2026-07-26 — iteration 14: skilled saucer targeting
+
+Small UFOs now lead a moving ship by half a second, while large UFOs retain their looser direct fire. The aim vector is calculated across the wrapped world, so a saucer cannot choose the long way around an edge. I retained meaningful random spread so a late-game saucer is dangerous without becoming an unavoidable sniper.
