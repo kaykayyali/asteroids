@@ -103,3 +103,7 @@ Space and Enter now begin a new game from either the start or Game Over screen. 
 ## 2026-07-26 — presentation fix: attract-mode idle motion
 
 Added four slow vector asteroids behind inactive overlays. They evolve through the already-owned animation frame rather than a second timer, so the start/Game Over presentation visibly demonstrates a live 60fps canvas without affecting gameplay state or restart behavior. I kept the count low to leave the title legible and rejected animated UI text because moving type is less useful than showing the actual playfield's motion.
+
+## 2026-07-26 — browser verification: keyboard lifecycle
+
+Ran a real 390×720 headless-Chromium load against a temporary local server, with in-memory test instrumentation only (the shipped files were unchanged by the harness). Initial focus was `#action`; two Canvas screenshots differed before starting, confirming attract motion. Space started play without mouse use and left score/bullets at zero even while held. After invoking the real Game Over transition, Space restarted with score/bullets reset; matched 360ms samples measured 22 RAF frames both before and after restart, with no browser console or page errors. This specifically guards against leaked listeners or a second simulation loop.
