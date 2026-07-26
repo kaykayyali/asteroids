@@ -43,3 +43,7 @@ The game now detects the platform reduced-motion preference and removes impact s
 ## 2026-07-26 — iteration 10: resilient live high score
 
 High score now updates immediately as a record is beaten and local-storage access is safely guarded for privacy-restricted browser contexts. A blocked storage API no longer prevents initialization or play. I rejected cloud scoreboards because they conflict with the no-service, directly-openable design.
+
+## 2026-07-26 — iteration 11: UFO warning signal
+
+The HUD now reports a short UFO signal before a saucer arrives. Separating the countdown from spawn logic made this a reliable warning rather than a random flash. I rejected a directional indicator: it would over-explain a threat that should stay surprising but fair.
