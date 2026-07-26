@@ -39,6 +39,7 @@
   let stars = [];
   let combo = 1;
   let comboTimer = 0;
+  let thrustSoundCooldown = 0;
 
   const width = () => canvas.width / pixelRatio;
   const height = () => canvas.height / pixelRatio;
@@ -301,6 +302,7 @@
     shake = 0;
     combo = 1;
     comboTimer = 0;
+    thrustSoundCooldown = 0;
     ship = makeShip();
     respawnTimer = 0;
     newWave();
@@ -428,6 +430,7 @@
     }
 
     ship.fireCooldown -= deltaTime;
+    thrustSoundCooldown -= deltaTime;
     ship.invulnerableFor -= deltaTime;
     ship.hyperCooldown = Math.max(0, ship.hyperCooldown - deltaTime);
     ship.thrusting = false;
@@ -446,8 +449,9 @@
       ship.thrusting = true;
       addThrustParticle();
 
-      if (Math.random() < 0.15) {
+      if (thrustSoundCooldown <= 0) {
         playSound('thrust');
+        thrustSoundCooldown = 0.09;
       }
     }
 

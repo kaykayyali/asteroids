@@ -77,3 +77,7 @@ Added a 1.8-second escalating asteroid-hit combo, capped at five times the base 
 ## 2026-07-26 — iteration 14: skilled saucer targeting
 
 Small UFOs now lead a moving ship by half a second, while large UFOs retain their looser direct fire. The aim vector is calculated across the wrapped world, so a saucer cannot choose the long way around an edge. I retained meaningful random spread so a late-game saucer is dangerous without becoming an unavoidable sniper.
+
+## 2026-07-26 — iteration 15: consistent thrust audio cadence
+
+Replaced frame-random thrust sound triggers with a 90ms cooldown. Sustained acceleration now has a clear, predictable engine pulse across different refresh rates and creates fewer oscillators during long thrusts. I rejected a looped audio node because it adds lifecycle complexity and risks a stuck engine sound after focus changes.
