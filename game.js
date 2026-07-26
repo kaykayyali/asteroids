@@ -51,7 +51,7 @@
     for (const list of [bullets, enemyBullets]) for (const b of list) { b.x += b.vx * dt; b.y += b.vy * dt; b.life -= dt; wrap(b); }
     bullets = bullets.filter(b => b.life > 0); enemyBullets = enemyBullets.filter(b => b.life > 0);
     for (const p of particles) { p.x += p.vx * dt; p.y += p.vy * dt; p.vx *= .96; p.vy *= .96; p.life -= dt; } particles = particles.filter(p => p.life > 0);
-    if (!ufo && level > 1 && (ufoClock -= dt) <= 0) { ufo = { x: Math.random() < .5 ? -30 : W() + 30, y: rand(80, H() - 120), vx: Math.random() < .5 ? 80 : -80, vy: 0, r: level > 4 && Math.random() < .4 ? 12 : 18, cool: 1 }; sound('ufo'); }
+    if (!ufo && level > 1 && (ufoClock -= dt) <= 0) { const dir = Math.random() < .5 ? 1 : -1; ufo = { x: dir > 0 ? -30 : W() + 30, y: rand(80, H() - 120), vx: dir * (78 + level * 2), vy: 0, r: level > 4 && Math.random() < .4 ? 12 : 18, cool: 1 }; sound('ufo'); }
     if (ufo) { ufo.x += ufo.vx * dt; ufo.y += Math.sin(performance.now() / 350) * 25 * dt; ufo.cool -= dt; if (ufo.cool < 0 && ship) { shoot(true); ufo.cool = rand(.8, 1.8); } if (ufo.x < -45 || ufo.x > W() + 45) ufo = null; }
     // Projectile-to-rock collision; splitting occurs only once per destroyed parent.
     for (const b of bullets) for (const a of asteroids) if (b.life > 0 && a.dead !== true && dist(b, a) < a.r + b.r) { b.life = 0; a.dead = true; award([100, 50, 20][a.size]); burst(a.x, a.y, a.size === 2 ? 20 : 12); shake = Math.max(shake, a.size === 2 ? 1 : .45); sound('boom'); if (a.size) { asteroids.push(makeAsteroid(a.size - 1, a.x, a.y, a), makeAsteroid(a.size - 1, a.x, a.y, a)); } }

@@ -11,3 +11,7 @@ Fragment velocities now inherit a controlled share of their parent rock's moment
 ## 2026-07-26 — iteration 2: safer re-entry
 
 Ship spawning now samples a clear location when debris occupies the center rather than relying only on invulnerability. This avoids a frustrating respawn directly inside a large rock while retaining the short visual re-entry grace period. I kept the central spawn as the first choice for predictability.
+
+## 2026-07-26 — iteration 3: reliable UFO passes
+
+UFO entry direction is now coupled to its velocity, guaranteeing every saucer crosses the playfield instead of occasionally drifting straight back off screen. Its speed increases gently with wave number. I rejected aggressive homing movement because classic UFOs should remain readable lateral threats.
