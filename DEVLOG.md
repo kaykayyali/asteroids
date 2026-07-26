@@ -65,3 +65,7 @@ Replaced the compressed source with conventionally formatted HTML, CSS, and Java
 ## 2026-07-26 — code-quality refactor: explanatory subsystem comments
 
 Added a file header and explicit sections for state, audio, lifecycle, physics/collisions, rendering, and input. Comments now document the design reasons behind delta-time clamping, toroidal distance, drag conversion, resize wrapping, audio envelopes, and pointer capture rather than paraphrasing syntax. I rejected line-by-line commentary because it would add noise without improving maintenance decisions.
+
+## 2026-07-26 — code-quality verification: lifecycle and narrow viewport
+
+Ran `node --check` over every JavaScript file and a whitespace/line-length check over all browser source files. Re-read `frame`, `startGame`, `resetGame`, and `resize`: exactly one animation loop and one set of input listeners are installed at boot; restart replaces state only; resize recalculates the DPR backing store, wraps every active entity, and rebuilds stars even when paused. Narrow-viewport CSS reduces button width/gaps below 440px, while pointer capture and cancellation handling preserve touch release behavior. No browser binary is installed here for a headless console pass.
