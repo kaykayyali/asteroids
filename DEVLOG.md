@@ -19,3 +19,7 @@ UFO entry direction is now coupled to its velocity, guaranteeing every saucer cr
 ## 2026-07-26 — iteration 4: single-fire touch hyperspace
 
 Removed a duplicate touch-path invocation for hyperspace. The shared input update now consumes both keyboard and touch H presses exactly once, preventing accidental double teleports. I retained the short cooldown to prevent a held control from chaining jumps.
+
+## 2026-07-26 — iteration 5: pause control
+
+Added a non-destructive P-key pause with an explicit centered status message. Simulation stops while rendering continues, and restart always clears the paused state. I chose not to auto-pause on browser blur because that can be surprising on mobile; blur still clears held inputs to avoid stuck thrust.

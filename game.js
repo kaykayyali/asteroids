@@ -11,7 +11,7 @@
   const H = () => canvas.height / devicePixelRatio;
   const TAU = Math.PI * 2;
   const key = new Set();
-  let audio, last = 0, active = false, gameOver = false, score = 0, high = +(localStorage.asteroidsHigh || 0);
+  let audio, last = 0, active = false, paused = false, gameOver = false, score = 0, high = +(localStorage.asteroidsHigh || 0);
   let level = 0, lives = 3, ship, asteroids, bullets, enemyBullets, particles, ufo, ufoClock, respawnTimer, shake, stars;
 
   function resize() { const dpr = Math.min(devicePixelRatio || 1, 2); canvas.width = innerWidth * dpr; canvas.height = innerHeight * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0); buildStars(); }
@@ -30,14 +30,14 @@
   function burst(x, y, count, color = '#baffdf') { for (let i = 0; i < count; i++) { const a = Math.random() * TAU, speed = rand(20, 160); particles.push({ x, y, vx: Math.cos(a) * speed, vy: Math.sin(a) * speed, life: rand(.25, .75), max: 1, color }); } }
   function newWave() { level++; const count = Math.min(3 + level, 10); for (let i = 0; i < count; i++) { let x, y; do { x = rand(0, W()); y = rand(0, H()); } while (ship && Math.hypot(x - ship.x, y - ship.y) < 140); asteroids.push(makeAsteroid(2, x, y)); } ufoClock = rand(8, 15) / Math.min(1 + level * .04, 1.7); sound('life'); }
   function resetGame() { score = 0; level = 0; lives = 3; asteroids = []; bullets = []; enemyBullets = []; particles = []; ufo = null; shake = 0; ship = makeShip(); respawnTimer = 0; newWave(); }
-  function start() { if (!audio) audio = new (window.AudioContext || window.webkitAudioContext)(); audio.resume(); resetGame(); active = true; gameOver = false; overlay.classList.add('hidden'); }
+  function start() { if (!audio) audio = new (window.AudioContext || window.webkitAudioContext)(); audio.resume(); resetGame(); active = true; paused = false; gameOver = false; overlay.classList.add('hidden'); }
   function end() { active = false; gameOver = true; high = Math.max(high, score); localStorage.asteroidsHigh = high; title.textContent = 'GAME OVER'; message.textContent = `Final score: ${score.toString().padStart(6, '0')}  •  High score: ${high.toString().padStart(6, '0')}`; action.textContent = 'PLAY AGAIN'; overlay.classList.remove('hidden'); }
   function shoot(enemy = false) { const source = enemy ? ufo : ship; if (!source) return; const a = enemy ? Math.atan2(ship.y - ufo.y, ship.x - ufo.x) + rand(-.25, .25) : ship.a; const speed = enemy ? 210 : 460; (enemy ? enemyBullets : bullets).push({ x: source.x + Math.cos(a) * (source.r || 14), y: source.y + Math.sin(a) * (source.r || 14), vx: (source.vx || 0) + Math.cos(a) * speed, vy: (source.vy || 0) + Math.sin(a) * speed, life: enemy ? 2.2 : 1.05, r: enemy ? 3 : 2 }); sound(enemy ? 'ufo' : 'fire'); }
   function hyperspace() { if (!ship || ship.hyper > 0) return; ship.x = rand(0, W()); ship.y = rand(0, H()); ship.vx = ship.vy = 0; ship.inv = .8; ship.hyper = 1.2; burst(ship.x, ship.y, 18, '#67ddff'); sound('hyper'); }
   function loseShip() { if (!ship || ship.inv > 0) return; burst(ship.x, ship.y, 30, '#baffdf'); sound('boom'); lives--; ship = null; respawnTimer = 1.6; if (lives < 0) end(); }
   function award(n) { score += n; if (score > 0 && score % 10000 < n) { lives++; sound('life'); } }
   function update(dt) {
-    if (!active) return;
+    if (!active || paused) return;
     if (ship) {
       ship.cool -= dt; ship.inv -= dt; ship.hyper = Math.max(0, (ship.hyper || 0) - dt); ship.flame = 0;
       if (key.has('ArrowLeft') || key.has('KeyA')) ship.a -= 4.5 * dt;
@@ -73,10 +73,10 @@
     if (ship && (ship.inv <= 0 || Math.floor(ship.inv * 9) % 2)) { drawWrapped((x, y) => { path([[15, 0], [-11, -9], [-5, 0], [-11, 9]], x, y, ship.a); if (ship.flame) { ctx.strokeStyle = '#ffcc80'; path([[-9, 0], [-19 - Math.random() * 7, 0]], x, y, ship.a, false); ctx.strokeStyle = '#baffdf'; } }, ship); }
     ctx.restore(); ctx.shadowBlur = 0; ctx.fillStyle = '#baffdf'; ctx.font = 'bold 16px "Courier New"'; ctx.textBaseline = 'top'; ctx.fillText(`SCORE ${score.toString().padStart(6, '0')}`, 20, 18); ctx.fillText(`HIGH ${high.toString().padStart(6, '0')}`, Math.max(160, W() / 2 - 65), 18); ctx.fillText(`WAVE ${level}`, W() - 106, 18);
     for (let i = 0; i < Math.max(0, lives); i++) path([[7, 0], [-5, -4], [-2, 0], [-5, 4]], 29 + i * 23, 52, -Math.PI / 2);
-    ctx.fillStyle = '#67cbb0'; ctx.font = '12px "Courier New"'; ctx.fillText('H: HYPERSPACE', 20, H() - 25);
+    ctx.fillStyle = '#67cbb0'; ctx.font = '12px "Courier New"'; ctx.fillText('H: HYPERSPACE  •  P: PAUSE', 20, H() - 25); if (paused) { ctx.fillStyle = '#d9fff1'; ctx.font = 'bold 28px "Courier New"'; ctx.textAlign = 'center'; ctx.fillText('PAUSED', W() / 2, H() / 2 - 15); ctx.font = '13px "Courier New"'; ctx.fillText('PRESS P TO RESUME', W() / 2, H() / 2 + 22); ctx.textAlign = 'left'; }
   }
   function frame(t) { const dt = Math.min(.033, (t - last) / 1000 || 0); last = t; update(dt); draw(); requestAnimationFrame(frame); }
-  addEventListener('resize', resize); addEventListener('keydown', e => { if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'Space'].includes(e.code)) e.preventDefault(); key.add(e.code); }); addEventListener('keyup', e => key.delete(e.code)); addEventListener('blur', () => key.clear());
+  addEventListener('resize', resize); addEventListener('keydown', e => { if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'Space'].includes(e.code)) e.preventDefault(); if (e.code === 'KeyP' && !e.repeat && active) { paused = !paused; key.clear(); } key.add(e.code); }); addEventListener('keyup', e => key.delete(e.code)); addEventListener('blur', () => key.clear());
   document.querySelectorAll('.touch').forEach(button => { const code = button.dataset.key; const down = e => { e.preventDefault(); key.add(code); }; const up = e => { e.preventDefault(); key.delete(code); }; button.addEventListener('pointerdown', down); button.addEventListener('pointerup', up); button.addEventListener('pointercancel', up); button.addEventListener('pointerleave', up); });
   action.addEventListener('click', start); resize(); requestAnimationFrame(frame);
 })();
