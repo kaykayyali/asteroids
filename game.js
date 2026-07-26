@@ -77,6 +77,6 @@
   }
   function frame(t) { const dt = Math.min(.033, (t - last) / 1000 || 0); last = t; update(dt); draw(); requestAnimationFrame(frame); }
   addEventListener('resize', resize); addEventListener('keydown', e => { if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'Space'].includes(e.code)) e.preventDefault(); key.add(e.code); }); addEventListener('keyup', e => key.delete(e.code)); addEventListener('blur', () => key.clear());
-  document.querySelectorAll('.touch').forEach(button => { const code = button.dataset.key; const down = e => { e.preventDefault(); key.add(code); if (code === 'KeyH') hyperspace(); }; const up = e => { e.preventDefault(); key.delete(code); }; button.addEventListener('pointerdown', down); button.addEventListener('pointerup', up); button.addEventListener('pointercancel', up); button.addEventListener('pointerleave', up); });
+  document.querySelectorAll('.touch').forEach(button => { const code = button.dataset.key; const down = e => { e.preventDefault(); key.add(code); }; const up = e => { e.preventDefault(); key.delete(code); }; button.addEventListener('pointerdown', down); button.addEventListener('pointerup', up); button.addEventListener('pointercancel', up); button.addEventListener('pointerleave', up); });
   action.addEventListener('click', start); resize(); requestAnimationFrame(frame);
 })();

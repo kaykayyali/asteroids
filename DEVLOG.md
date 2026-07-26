@@ -15,3 +15,7 @@ Ship spawning now samples a clear location when debris occupies the center rathe
 ## 2026-07-26 — iteration 3: reliable UFO passes
 
 UFO entry direction is now coupled to its velocity, guaranteeing every saucer crosses the playfield instead of occasionally drifting straight back off screen. Its speed increases gently with wave number. I rejected aggressive homing movement because classic UFOs should remain readable lateral threats.
+
+## 2026-07-26 — iteration 4: single-fire touch hyperspace
+
+Removed a duplicate touch-path invocation for hyperspace. The shared input update now consumes both keyboard and touch H presses exactly once, preventing accidental double teleports. I retained the short cooldown to prevent a held control from chaining jumps.
