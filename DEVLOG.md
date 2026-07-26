@@ -89,3 +89,9 @@ Finishing a field now awards 250 points per completed wave and briefly confirms 
 ## 2026-07-26 — iteration 17: authentic late-wave hyperspace risk
 
 From wave four onward, 12% of hyperspace jumps become unstable: they select an unvetted location and provide only a short grace period, with an unmistakable amber warning. Normal jumps remain safe, so hyperspace is still a recovery tool. I rejected enabling this risk from wave one because new players need to learn the escape mechanic before managing its classic tradeoff.
+
+## 2026-07-26 — Exhausted (post-review iteration)
+
+Re-ran JavaScript syntax validation, source line-length checks, and whitespace validation after the five additional gameplay passes. I also re-read the single RAF ownership, restart replacement path, resize wrapping path, and pointer-captured touch bindings; they remain independent of the new score, timing, and hyperspace state.
+
+Considered and rejected: power-up drops (would move away from Asteroids' pure ship-versus-field loop), a boss encounter (changes the arcade game's primary threat model), permanent ship upgrades (weakens score-driven replayability), online leaderboards (breaks standalone use), and a more punitive hyperspace failure rate (would make recovery feel arbitrary). The implemented additions cover scoring depth, enemy skill, pacing, input/audio feel, and a classic risk tradeoff without undermining the original game.
