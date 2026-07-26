@@ -51,3 +51,9 @@ The HUD now reports a short UFO signal before a saucer arrives. Separating the c
 ## 2026-07-26 — iteration 12: resize-state integrity
 
 All active entities now wrap immediately after a viewport resize, including while paused. This closes the edge case where a narrower resized viewport could leave a ship or projectile visually outside the field until simulation resumed. I retained the device-pixel-ratio cap because it protects performance on very dense displays.
+
+## 2026-07-26 — Exhausted
+
+Verified the final JavaScript with `node --check game.js`; no headless browser is installed in this environment for an automated console pass. The game is intentionally dependency-free and uses only browser-native Canvas, input, storage, and Web Audio APIs, so opening `index.html` remains the complete runtime path.
+
+I considered and rejected: multiplayer/network scoreboards (would break the standalone design), an external asset pack (contrary to synthesized/vector presentation), procedural missions (would dilute the focused arcade loop), a settings panel (would overcrowd the cabinet UI), stronger UFO homing (less fair/readable), unlimited late-wave asteroid count (poor performance/readability), and a build tool/framework (unnecessary surface area). The remaining ideas are stylistic variants rather than meaningful improvements to the requested 1979 Asteroids loop.
