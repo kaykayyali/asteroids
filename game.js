@@ -40,6 +40,8 @@
   let combo = 1;
   let comboTimer = 0;
   let thrustSoundCooldown = 0;
+  let clearBonus = 0;
+  let clearBonusTimer = 0;
 
   const width = () => canvas.width / pixelRatio;
   const height = () => canvas.height / pixelRatio;
@@ -303,6 +305,8 @@
     combo = 1;
     comboTimer = 0;
     thrustSoundCooldown = 0;
+    clearBonus = 0;
+    clearBonusTimer = 0;
     ship = makeShip();
     respawnTimer = 0;
     newWave();
@@ -640,6 +644,7 @@
 
     waveBannerTimer -= deltaTime;
     comboTimer -= deltaTime;
+    clearBonusTimer -= deltaTime;
     if (comboTimer <= 0) {
       combo = 1;
     }
@@ -652,6 +657,9 @@
     resolveShipCollisions();
 
     if (asteroids.length === 0) {
+      clearBonus = 250 * level;
+      clearBonusTimer = 1.35;
+      addScore(clearBonus);
       newWave();
     }
 
@@ -762,6 +770,14 @@
       ctx.fillStyle = '#ffcc8e';
       ctx.textAlign = 'center';
       ctx.fillText(`COMBO x${combo - 1}`, width() / 2, 45);
+      ctx.textAlign = 'left';
+      ctx.fillStyle = '#baffdf';
+    }
+
+    if (clearBonusTimer > 0) {
+      ctx.fillStyle = '#8fe8ff';
+      ctx.textAlign = 'center';
+      ctx.fillText(`SECTOR CLEAR +${clearBonus}`, width() / 2, 65);
       ctx.textAlign = 'left';
       ctx.fillStyle = '#baffdf';
     }

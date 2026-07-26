@@ -81,3 +81,7 @@ Small UFOs now lead a moving ship by half a second, while large UFOs retain thei
 ## 2026-07-26 — iteration 15: consistent thrust audio cadence
 
 Replaced frame-random thrust sound triggers with a 90ms cooldown. Sustained acceleration now has a clear, predictable engine pulse across different refresh rates and creates fewer oscillators during long thrusts. I rejected a looped audio node because it adds lifecycle complexity and risks a stuck engine sound after focus changes.
+
+## 2026-07-26 — iteration 16: escalating sector-clear bonus
+
+Finishing a field now awards 250 points per completed wave and briefly confirms the value in the HUD. This gives a useful reason to close out dangerous last fragments instead of endlessly orbiting them, while increasing rewards alongside difficulty. I rejected a time bonus because it would punish the deliberate, careful flight style the game also supports.
