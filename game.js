@@ -15,6 +15,7 @@
   const keys = new Set();
   const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+  // State lives in one closure so a restart can replace entities without adding listeners.
   let pixelRatio = 1;
   let audioContext;
   let lastFrameTime = 0;
@@ -40,6 +41,7 @@
   const width = () => canvas.width / pixelRatio;
   const height = () => canvas.height / pixelRatio;
 
+  // Persisting a high score is optional; storage failures must never block first paint.
   function readHighScore() {
     try {
       return Number(localStorage.asteroidsHigh || 0);
@@ -73,6 +75,7 @@
     return Math.hypot(shortestX, shortestY);
   }
 
+  // Resizing updates the backing store and wraps paused entities immediately, not next tick.
   function resize() {
     pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
     canvas.width = Math.max(1, Math.floor(window.innerWidth * pixelRatio));
@@ -103,6 +106,8 @@
     }));
   }
 
+  // Audio --------------------------------------------------------------------
+  // Oscillator envelopes avoid asset files and fade to near-silence to prevent clicks.
   function playTone(
     frequency,
     duration = 0.08,
@@ -145,6 +150,8 @@
     sounds[name]?.();
   }
 
+  // Lifecycle ----------------------------------------------------------------
+  // A respawn samples safe positions because a center spawn can overlap wrapped debris.
   function clearSpawnPosition() {
     let x = width() / 2;
     let y = height() / 2;
@@ -264,6 +271,7 @@
     playSound('life');
   }
 
+  // Reset replaces all per-run collections while the single animation loop keeps running.
   function resetGame() {
     score = 0;
     level = 0;
@@ -382,6 +390,8 @@
     });
   }
 
+  // Physics and collisions ----------------------------------------------------
+  // Motion is delta-time based so speed is stable across monitors and brief frame stalls.
   function updateShip(deltaTime) {
     if (!ship) {
       respawnTimer -= deltaTime;
@@ -434,6 +444,7 @@
       ship.vy *= 310 / speed;
     }
 
+    // Convert the original per-60fps drag into a frame-rate-independent decay.
     ship.vx *= Math.pow(0.985, deltaTime * 60);
     ship.vy *= Math.pow(0.985, deltaTime * 60);
     ship.x += ship.vx * deltaTime;
@@ -502,6 +513,7 @@
     }
 
     ufo.x += ufo.vx * deltaTime;
+    // The sine drift is integrated over time so the UFO glides rather than teleports.
     ufo.y += Math.sin(now / 350) * 25 * deltaTime;
     ufo.fireCooldown -= deltaTime;
 
@@ -568,6 +580,7 @@
     });
   }
 
+  // Collision checks use toroidalDistance, so hits near opposite screen edges are fair.
   function resolveShipCollisions() {
     if (!ship) {
       return;
@@ -611,6 +624,8 @@
     shake = Math.max(0, shake - deltaTime * 3);
   }
 
+  // Rendering ----------------------------------------------------------------
+  // Vector paths are redrawn every frame so the glow remains crisp at any device scale.
   function drawPath(points, x, y, angle = 0, close = true) {
     ctx.beginPath();
 
@@ -796,7 +811,10 @@
     drawHud();
   }
 
+  // Input --------------------------------------------------------------------
+  // Input listeners are installed once; touch feeds the same key set as a physical keyboard.
   function frame(now) {
+    // Cap simulation time after a tab stall so objects cannot tunnel through each other.
     const deltaTime = Math.min(0.033, (now - lastFrameTime) / 1000 || 0);
     lastFrameTime = now;
     update(deltaTime, now);
@@ -827,6 +845,7 @@
 
       const press = event => {
         event.preventDefault();
+        // Capture pairs a release with this button even when the finger drifts off it.
         button.setPointerCapture?.(event.pointerId);
         keys.add(code);
       };

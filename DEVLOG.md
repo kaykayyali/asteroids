@@ -61,3 +61,7 @@ I considered and rejected: multiplayer/network scoreboards (would break the stan
 ## 2026-07-26 — code-quality refactor: readable source layout
 
 Replaced the compressed source with conventionally formatted HTML, CSS, and JavaScript. The game state and update/render responsibilities are now separated into named functions, every source line is at or below 100 characters, and narrow screens receive appropriately smaller touch controls. Pointer capture was added so touch presses release reliably even if a finger leaves its original button. This deliberately preserves the existing game rules; documentation is added in the following commit so the formatting diff remains reviewable on its own.
+
+## 2026-07-26 — code-quality refactor: explanatory subsystem comments
+
+Added a file header and explicit sections for state, audio, lifecycle, physics/collisions, rendering, and input. Comments now document the design reasons behind delta-time clamping, toroidal distance, drag conversion, resize wrapping, audio envelopes, and pointer capture rather than paraphrasing syntax. I rejected line-by-line commentary because it would add noise without improving maintenance decisions.
