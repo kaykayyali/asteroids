@@ -47,3 +47,7 @@ High score now updates immediately as a record is beaten and local-storage acces
 ## 2026-07-26 — iteration 11: UFO warning signal
 
 The HUD now reports a short UFO signal before a saucer arrives. Separating the countdown from spawn logic made this a reliable warning rather than a random flash. I rejected a directional indicator: it would over-explain a threat that should stay surprising but fair.
+
+## 2026-07-26 — iteration 12: resize-state integrity
+
+All active entities now wrap immediately after a viewport resize, including while paused. This closes the edge case where a narrower resized viewport could leave a ship or projectile visually outside the field until simulation resumed. I retained the device-pixel-ratio cap because it protects performance on very dense displays.

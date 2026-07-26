@@ -17,7 +17,7 @@
   let audio, last = 0, active = false, paused = false, muted = false, gameOver = false, score = 0, high = readHigh();
   let level = 0, lives = 3, ship, asteroids, bullets, enemyBullets, particles, ufo, ufoClock, respawnTimer, waveBanner, shake, stars;
 
-  function resize() { const dpr = Math.min(devicePixelRatio || 1, 2); canvas.width = innerWidth * dpr; canvas.height = innerHeight * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0); buildStars(); }
+  function resize() { const dpr = Math.min(devicePixelRatio || 1, 2); canvas.width = innerWidth * dpr; canvas.height = innerHeight * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0); for (const entity of [ship, ufo, ...(asteroids || []), ...(bullets || []), ...(enemyBullets || []), ...(particles || [])]) if (entity) wrap(entity); buildStars(); }
   function buildStars() { stars = Array.from({ length: Math.max(35, Math.floor(W() * H() / (reduceMotion ? 18000 : 11000))) }, () => ({ x: Math.random() * W(), y: Math.random() * H(), a: .15 + Math.random() * .5, s: Math.random() * 1.4 })); }
   function wrap(o) { o.x = (o.x + W()) % W(); o.y = (o.y + H()) % H(); }
   function dist(a, b) { const dx = Math.abs(a.x - b.x), dy = Math.abs(a.y - b.y); return Math.hypot(Math.min(dx, W() - dx), Math.min(dy, H() - dy)); }
