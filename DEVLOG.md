@@ -85,3 +85,7 @@ Replaced frame-random thrust sound triggers with a 90ms cooldown. Sustained acce
 ## 2026-07-26 — iteration 16: escalating sector-clear bonus
 
 Finishing a field now awards 250 points per completed wave and briefly confirms the value in the HUD. This gives a useful reason to close out dangerous last fragments instead of endlessly orbiting them, while increasing rewards alongside difficulty. I rejected a time bonus because it would punish the deliberate, careful flight style the game also supports.
+
+## 2026-07-26 — iteration 17: authentic late-wave hyperspace risk
+
+From wave four onward, 12% of hyperspace jumps become unstable: they select an unvetted location and provide only a short grace period, with an unmistakable amber warning. Normal jumps remain safe, so hyperspace is still a recovery tool. I rejected enabling this risk from wave one because new players need to learn the escape mechanic before managing its classic tradeoff.

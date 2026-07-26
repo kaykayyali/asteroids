@@ -42,6 +42,7 @@
   let thrustSoundCooldown = 0;
   let clearBonus = 0;
   let clearBonusTimer = 0;
+  let hyperspaceWarningTimer = 0;
 
   const width = () => canvas.width / pixelRatio;
   const height = () => canvas.height / pixelRatio;
@@ -307,6 +308,7 @@
     thrustSoundCooldown = 0;
     clearBonus = 0;
     clearBonusTimer = 0;
+    hyperspaceWarningTimer = 0;
     ship = makeShip();
     respawnTimer = 0;
     newWave();
@@ -377,14 +379,18 @@
       return;
     }
 
-    const position = clearSpawnPosition();
+    const unstableJump = level >= 4 && Math.random() < 0.12;
+    const position = unstableJump
+      ? { x: random(0, width()), y: random(0, height()) }
+      : clearSpawnPosition();
     ship.x = position.x;
     ship.y = position.y;
     ship.vx = 0;
     ship.vy = 0;
-    ship.invulnerableFor = 0.8;
+    ship.invulnerableFor = unstableJump ? 0.25 : 0.8;
     ship.hyperCooldown = 1.2;
-    burst(ship.x, ship.y, 18, '#67ddff');
+    hyperspaceWarningTimer = unstableJump ? 1.2 : 0;
+    burst(ship.x, ship.y, 18, unstableJump ? '#ffcc80' : '#67ddff');
     playSound('hyper');
   }
 
@@ -645,6 +651,7 @@
     waveBannerTimer -= deltaTime;
     comboTimer -= deltaTime;
     clearBonusTimer -= deltaTime;
+    hyperspaceWarningTimer -= deltaTime;
     if (comboTimer <= 0) {
       combo = 1;
     }
@@ -778,6 +785,14 @@
       ctx.fillStyle = '#8fe8ff';
       ctx.textAlign = 'center';
       ctx.fillText(`SECTOR CLEAR +${clearBonus}`, width() / 2, 65);
+      ctx.textAlign = 'left';
+      ctx.fillStyle = '#baffdf';
+    }
+
+    if (hyperspaceWarningTimer > 0) {
+      ctx.fillStyle = '#ffcc8e';
+      ctx.textAlign = 'center';
+      ctx.fillText('UNSTABLE HYPERSPACE', width() / 2, 85);
       ctx.textAlign = 'left';
       ctx.fillStyle = '#baffdf';
     }
