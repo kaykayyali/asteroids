@@ -42,7 +42,7 @@
       ship.cool -= dt; ship.inv -= dt; ship.hyper = Math.max(0, (ship.hyper || 0) - dt); ship.flame = 0;
       if (key.has('ArrowLeft') || key.has('KeyA')) ship.a -= 4.5 * dt;
       if (key.has('ArrowRight') || key.has('KeyD')) ship.a += 4.5 * dt;
-      if (key.has('ArrowUp') || key.has('KeyW')) { ship.vx += Math.cos(ship.a) * 235 * dt; ship.vy += Math.sin(ship.a) * 235 * dt; ship.flame = 1; if (Math.random() < .15) sound('thrust'); }
+      if (key.has('ArrowUp') || key.has('KeyW')) { ship.vx += Math.cos(ship.a) * 235 * dt; ship.vy += Math.sin(ship.a) * 235 * dt; ship.flame = 1; if (Math.random() < .35) { const a = ship.a + Math.PI + rand(-.35, .35); particles.push({ x: ship.x - Math.cos(ship.a) * 10, y: ship.y - Math.sin(ship.a) * 10, vx: ship.vx * .25 + Math.cos(a) * rand(45, 95), vy: ship.vy * .25 + Math.sin(a) * rand(45, 95), life: .22, max: 1, color: '#ffcc80' }); } if (Math.random() < .15) sound('thrust'); }
       if ((key.has('Space') || key.has('KeyX')) && ship.cool <= 0) { shoot(); ship.cool = .19; }
       if (key.has('KeyH')) { key.delete('KeyH'); hyperspace(); }
       const speed = Math.hypot(ship.vx, ship.vy); if (speed > 310) { ship.vx *= 310 / speed; ship.vy *= 310 / speed; } ship.vx *= Math.pow(.985, dt * 60); ship.vy *= Math.pow(.985, dt * 60); ship.x += ship.vx * dt; ship.y += ship.vy * dt; wrap(ship);

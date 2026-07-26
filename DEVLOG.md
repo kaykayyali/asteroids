@@ -27,3 +27,7 @@ Added a non-destructive P-key pause with an explicit centered status message. Si
 ## 2026-07-26 — iteration 6: accessible sound toggle
 
 Added a visible M-key sound toggle that silences synthesized effects without suspending the game or creating extra audio contexts. This is useful in shared/mobile environments and preserves immediate resumption. A volume slider was rejected because it would clutter the deliberately sparse arcade HUD.
+
+## 2026-07-26 — iteration 7: thrust feedback
+
+Added a sparse amber particle exhaust behind the ship during thrust, using the existing particle pool and velocity so it reinforces direction without compromising vector clarity. I rejected a continuous smoke trail because it made slow navigation noisier than it was helpful.
