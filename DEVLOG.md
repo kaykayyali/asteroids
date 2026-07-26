@@ -23,3 +23,7 @@ Removed a duplicate touch-path invocation for hyperspace. The shared input updat
 ## 2026-07-26 — iteration 5: pause control
 
 Added a non-destructive P-key pause with an explicit centered status message. Simulation stops while rendering continues, and restart always clears the paused state. I chose not to auto-pause on browser blur because that can be surprising on mobile; blur still clears held inputs to avoid stuck thrust.
+
+## 2026-07-26 — iteration 6: accessible sound toggle
+
+Added a visible M-key sound toggle that silences synthesized effects without suspending the game or creating extra audio contexts. This is useful in shared/mobile environments and preserves immediate resumption. A volume slider was rejected because it would clutter the deliberately sparse arcade HUD.

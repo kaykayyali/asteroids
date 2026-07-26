@@ -9,6 +9,7 @@ A polished, dependency-free browser homage to Atari's 1979 vector arcade shooter
 - **Space** or **X** — fire
 - **H** — hyperspace
 - **P** — pause / resume
+- **M** — toggle synthesized sound
 - The illuminated on-screen buttons provide the same controls on touch devices.
 
 Destroy rocks before they collide with your ship. Large rocks split twice, later waves add more and faster debris, and UFOs arrive from wave two. Every 10,000 points earns an extra ship. Your high score persists locally in the browser.

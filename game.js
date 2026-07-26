@@ -11,7 +11,7 @@
   const H = () => canvas.height / devicePixelRatio;
   const TAU = Math.PI * 2;
   const key = new Set();
-  let audio, last = 0, active = false, paused = false, gameOver = false, score = 0, high = +(localStorage.asteroidsHigh || 0);
+  let audio, last = 0, active = false, paused = false, muted = false, gameOver = false, score = 0, high = +(localStorage.asteroidsHigh || 0);
   let level = 0, lives = 3, ship, asteroids, bullets, enemyBullets, particles, ufo, ufoClock, respawnTimer, shake, stars;
 
   function resize() { const dpr = Math.min(devicePixelRatio || 1, 2); canvas.width = innerWidth * dpr; canvas.height = innerHeight * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0); buildStars(); }
@@ -20,7 +20,7 @@
   function dist(a, b) { const dx = Math.abs(a.x - b.x), dy = Math.abs(a.y - b.y); return Math.hypot(Math.min(dx, W() - dx), Math.min(dy, H() - dy)); }
   function rand(min, max) { return min + Math.random() * (max - min); }
   function tone(freq, time = .08, type = 'square', gain = .04, slide = 0) {
-    if (!audio) return; const now = audio.currentTime, osc = audio.createOscillator(), amp = audio.createGain();
+    if (!audio || muted) return; const now = audio.currentTime, osc = audio.createOscillator(), amp = audio.createGain();
     osc.type = type; osc.frequency.setValueAtTime(freq, now); osc.frequency.exponentialRampToValueAtTime(Math.max(20, freq + slide), now + time);
     amp.gain.setValueAtTime(gain, now); amp.gain.exponentialRampToValueAtTime(.001, now + time); osc.connect(amp).connect(audio.destination); osc.start(now); osc.stop(now + time);
   }
@@ -73,10 +73,10 @@
     if (ship && (ship.inv <= 0 || Math.floor(ship.inv * 9) % 2)) { drawWrapped((x, y) => { path([[15, 0], [-11, -9], [-5, 0], [-11, 9]], x, y, ship.a); if (ship.flame) { ctx.strokeStyle = '#ffcc80'; path([[-9, 0], [-19 - Math.random() * 7, 0]], x, y, ship.a, false); ctx.strokeStyle = '#baffdf'; } }, ship); }
     ctx.restore(); ctx.shadowBlur = 0; ctx.fillStyle = '#baffdf'; ctx.font = 'bold 16px "Courier New"'; ctx.textBaseline = 'top'; ctx.fillText(`SCORE ${score.toString().padStart(6, '0')}`, 20, 18); ctx.fillText(`HIGH ${high.toString().padStart(6, '0')}`, Math.max(160, W() / 2 - 65), 18); ctx.fillText(`WAVE ${level}`, W() - 106, 18);
     for (let i = 0; i < Math.max(0, lives); i++) path([[7, 0], [-5, -4], [-2, 0], [-5, 4]], 29 + i * 23, 52, -Math.PI / 2);
-    ctx.fillStyle = '#67cbb0'; ctx.font = '12px "Courier New"'; ctx.fillText('H: HYPERSPACE  •  P: PAUSE', 20, H() - 25); if (paused) { ctx.fillStyle = '#d9fff1'; ctx.font = 'bold 28px "Courier New"'; ctx.textAlign = 'center'; ctx.fillText('PAUSED', W() / 2, H() / 2 - 15); ctx.font = '13px "Courier New"'; ctx.fillText('PRESS P TO RESUME', W() / 2, H() / 2 + 22); ctx.textAlign = 'left'; }
+    ctx.fillStyle = '#67cbb0'; ctx.font = '12px "Courier New"'; ctx.fillText(`H: HYPERSPACE  •  P: PAUSE  •  M: SOUND ${muted ? 'OFF' : 'ON'}`, 20, H() - 25); if (paused) { ctx.fillStyle = '#d9fff1'; ctx.font = 'bold 28px "Courier New"'; ctx.textAlign = 'center'; ctx.fillText('PAUSED', W() / 2, H() / 2 - 15); ctx.font = '13px "Courier New"'; ctx.fillText('PRESS P TO RESUME', W() / 2, H() / 2 + 22); ctx.textAlign = 'left'; }
   }
   function frame(t) { const dt = Math.min(.033, (t - last) / 1000 || 0); last = t; update(dt); draw(); requestAnimationFrame(frame); }
-  addEventListener('resize', resize); addEventListener('keydown', e => { if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'Space'].includes(e.code)) e.preventDefault(); if (e.code === 'KeyP' && !e.repeat && active) { paused = !paused; key.clear(); } key.add(e.code); }); addEventListener('keyup', e => key.delete(e.code)); addEventListener('blur', () => key.clear());
+  addEventListener('resize', resize); addEventListener('keydown', e => { if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'Space'].includes(e.code)) e.preventDefault(); if (e.code === 'KeyP' && !e.repeat && active) { paused = !paused; key.clear(); } if (e.code === 'KeyM' && !e.repeat) muted = !muted; key.add(e.code); }); addEventListener('keyup', e => key.delete(e.code)); addEventListener('blur', () => key.clear());
   document.querySelectorAll('.touch').forEach(button => { const code = button.dataset.key; const down = e => { e.preventDefault(); key.add(code); }; const up = e => { e.preventDefault(); key.delete(code); }; button.addEventListener('pointerdown', down); button.addEventListener('pointerup', up); button.addEventListener('pointercancel', up); button.addEventListener('pointerleave', up); });
   action.addEventListener('click', start); resize(); requestAnimationFrame(frame);
 })();
