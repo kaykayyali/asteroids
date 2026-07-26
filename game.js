@@ -12,7 +12,7 @@
   const TAU = Math.PI * 2;
   const key = new Set();
   let audio, last = 0, active = false, paused = false, muted = false, gameOver = false, score = 0, high = +(localStorage.asteroidsHigh || 0);
-  let level = 0, lives = 3, ship, asteroids, bullets, enemyBullets, particles, ufo, ufoClock, respawnTimer, shake, stars;
+  let level = 0, lives = 3, ship, asteroids, bullets, enemyBullets, particles, ufo, ufoClock, respawnTimer, waveBanner, shake, stars;
 
   function resize() { const dpr = Math.min(devicePixelRatio || 1, 2); canvas.width = innerWidth * dpr; canvas.height = innerHeight * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0); buildStars(); }
   function buildStars() { stars = Array.from({ length: Math.max(45, Math.floor(W() * H() / 11000)) }, () => ({ x: Math.random() * W(), y: Math.random() * H(), a: .15 + Math.random() * .5, s: Math.random() * 1.4 })); }
@@ -28,7 +28,7 @@
   function makeShip() { let x = W() / 2, y = H() / 2; for (let i = 0; i < 28 && asteroids?.some(a => Math.hypot(a.x - x, a.y - y) < a.r + 110); i++) { x = rand(80, W() - 80); y = rand(80, H() - 80); } return { x, y, vx: 0, vy: 0, a: -Math.PI / 2, r: 13, cool: 0, inv: 2.6, flame: 0 }; }
   function makeAsteroid(size, x = rand(0, W()), y = rand(0, H()), parent = null) { const r = [12, 23, 40][size], n = 8 + Math.floor(Math.random() * 5), shape = Array.from({ length: n }, () => r * rand(.7, 1.15)); const angle = Math.random() * TAU, speed = rand(18, 55) + level * 3; return { x, y, vx: (parent?.vx || 0) * .35 + Math.cos(angle) * speed, vy: (parent?.vy || 0) * .35 + Math.sin(angle) * speed, a: 0, spin: rand(-1.2, 1.2), size, r, shape }; }
   function burst(x, y, count, color = '#baffdf') { for (let i = 0; i < count; i++) { const a = Math.random() * TAU, speed = rand(20, 160); particles.push({ x, y, vx: Math.cos(a) * speed, vy: Math.sin(a) * speed, life: rand(.25, .75), max: 1, color }); } }
-  function newWave() { level++; const count = Math.min(3 + level, 10); for (let i = 0; i < count; i++) { let x, y; do { x = rand(0, W()); y = rand(0, H()); } while (ship && Math.hypot(x - ship.x, y - ship.y) < 140); asteroids.push(makeAsteroid(2, x, y)); } ufoClock = rand(8, 15) / Math.min(1 + level * .04, 1.7); sound('life'); }
+  function newWave() { level++; waveBanner = 1.65; const count = Math.min(3 + level, 10); for (let i = 0; i < count; i++) { let x, y; do { x = rand(0, W()); y = rand(0, H()); } while (ship && Math.hypot(x - ship.x, y - ship.y) < 140); asteroids.push(makeAsteroid(2, x, y)); } ufoClock = rand(8, 15) / Math.min(1 + level * .04, 1.7); sound('life'); }
   function resetGame() { score = 0; level = 0; lives = 3; asteroids = []; bullets = []; enemyBullets = []; particles = []; ufo = null; shake = 0; ship = makeShip(); respawnTimer = 0; newWave(); }
   function start() { if (!audio) audio = new (window.AudioContext || window.webkitAudioContext)(); audio.resume(); resetGame(); active = true; paused = false; gameOver = false; overlay.classList.add('hidden'); }
   function end() { active = false; gameOver = true; high = Math.max(high, score); localStorage.asteroidsHigh = high; title.textContent = 'GAME OVER'; message.textContent = `Final score: ${score.toString().padStart(6, '0')}  •  High score: ${high.toString().padStart(6, '0')}`; action.textContent = 'PLAY AGAIN'; overlay.classList.remove('hidden'); }
@@ -37,7 +37,7 @@
   function loseShip() { if (!ship || ship.inv > 0) return; burst(ship.x, ship.y, 30, '#baffdf'); sound('boom'); lives--; ship = null; respawnTimer = 1.6; if (lives < 0) end(); }
   function award(n) { score += n; if (score > 0 && score % 10000 < n) { lives++; sound('life'); } }
   function update(dt) {
-    if (!active || paused) return;
+    if (!active || paused) return; waveBanner -= dt;
     if (ship) {
       ship.cool -= dt; ship.inv -= dt; ship.hyper = Math.max(0, (ship.hyper || 0) - dt); ship.flame = 0;
       if (key.has('ArrowLeft') || key.has('KeyA')) ship.a -= 4.5 * dt;
@@ -73,7 +73,7 @@
     if (ship && (ship.inv <= 0 || Math.floor(ship.inv * 9) % 2)) { drawWrapped((x, y) => { path([[15, 0], [-11, -9], [-5, 0], [-11, 9]], x, y, ship.a); if (ship.flame) { ctx.strokeStyle = '#ffcc80'; path([[-9, 0], [-19 - Math.random() * 7, 0]], x, y, ship.a, false); ctx.strokeStyle = '#baffdf'; } }, ship); }
     ctx.restore(); ctx.shadowBlur = 0; ctx.fillStyle = '#baffdf'; ctx.font = 'bold 16px "Courier New"'; ctx.textBaseline = 'top'; ctx.fillText(`SCORE ${score.toString().padStart(6, '0')}`, 20, 18); ctx.fillText(`HIGH ${high.toString().padStart(6, '0')}`, Math.max(160, W() / 2 - 65), 18); ctx.fillText(`WAVE ${level}`, W() - 106, 18);
     for (let i = 0; i < Math.max(0, lives); i++) path([[7, 0], [-5, -4], [-2, 0], [-5, 4]], 29 + i * 23, 52, -Math.PI / 2);
-    ctx.fillStyle = '#67cbb0'; ctx.font = '12px "Courier New"'; ctx.fillText(`H: HYPERSPACE  •  P: PAUSE  •  M: SOUND ${muted ? 'OFF' : 'ON'}`, 20, H() - 25); if (paused) { ctx.fillStyle = '#d9fff1'; ctx.font = 'bold 28px "Courier New"'; ctx.textAlign = 'center'; ctx.fillText('PAUSED', W() / 2, H() / 2 - 15); ctx.font = '13px "Courier New"'; ctx.fillText('PRESS P TO RESUME', W() / 2, H() / 2 + 22); ctx.textAlign = 'left'; }
+    ctx.fillStyle = '#67cbb0'; ctx.font = '12px "Courier New"'; ctx.fillText(`H: HYPERSPACE  •  P: PAUSE  •  M: SOUND ${muted ? 'OFF' : 'ON'}`, 20, H() - 25); if (waveBanner > 0) { ctx.globalAlpha = Math.min(1, waveBanner * 2); ctx.fillStyle = '#d9fff1'; ctx.font = 'bold 25px "Courier New"'; ctx.textAlign = 'center'; ctx.fillText(`WAVE ${level}`, W() / 2, H() * .30); ctx.globalAlpha = 1; ctx.textAlign = 'left'; } if (paused) { ctx.fillStyle = '#d9fff1'; ctx.font = 'bold 28px "Courier New"'; ctx.textAlign = 'center'; ctx.fillText('PAUSED', W() / 2, H() / 2 - 15); ctx.font = '13px "Courier New"'; ctx.fillText('PRESS P TO RESUME', W() / 2, H() / 2 + 22); ctx.textAlign = 'left'; }
   }
   function frame(t) { const dt = Math.min(.033, (t - last) / 1000 || 0); last = t; update(dt); draw(); requestAnimationFrame(frame); }
   addEventListener('resize', resize); addEventListener('keydown', e => { if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'Space'].includes(e.code)) e.preventDefault(); if (e.code === 'KeyP' && !e.repeat && active) { paused = !paused; key.clear(); } if (e.code === 'KeyM' && !e.repeat) muted = !muted; key.add(e.code); }); addEventListener('keyup', e => key.delete(e.code)); addEventListener('blur', () => key.clear());

@@ -31,3 +31,7 @@ Added a visible M-key sound toggle that silences synthesized effects without sus
 ## 2026-07-26 — iteration 7: thrust feedback
 
 Added a sparse amber particle exhaust behind the ship during thrust, using the existing particle pool and velocity so it reinforces direction without compromising vector clarity. I rejected a continuous smoke trail because it made slow navigation noisier than it was helpful.
+
+## 2026-07-26 — iteration 8: wave transition cue
+
+Each fresh field now gets a brief, fading wave announcement. This makes the increasing difficulty legible without interrupting play or requiring a modal. I rejected a pause between waves because the empty-field moment is a useful breather and classic arcade pacing benefits from continuity.
