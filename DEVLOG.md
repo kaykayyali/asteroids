@@ -35,3 +35,7 @@ Added a sparse amber particle exhaust behind the ship during thrust, using the e
 ## 2026-07-26 — iteration 8: wave transition cue
 
 Each fresh field now gets a brief, fading wave announcement. This makes the increasing difficulty legible without interrupting play or requiring a modal. I rejected a pause between waves because the empty-field moment is a useful breather and classic arcade pacing benefits from continuity.
+
+## 2026-07-26 — iteration 9: reduced-motion support
+
+The game now detects the platform reduced-motion preference and removes impact shake, suppresses exhaust, and substantially reduces explosion/background particle density. Core movement remains intact. I rejected altering ship or asteroid speed because that would change play rather than only presentation.

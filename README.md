@@ -21,3 +21,5 @@ Destroy rocks before they collide with your ship. Large rocks split twice, later
 ## Accessibility and testing
 
 The start/restart control is native and keyboard-focusable, touch buttons are labelled, and visual state is announced through the overlay. Basic syntax verification: `node --check game.js`.
+
+The game also respects the operating system's **reduced-motion** preference by reducing particles, background density, and impact shake.

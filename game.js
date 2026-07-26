@@ -11,11 +11,12 @@
   const H = () => canvas.height / devicePixelRatio;
   const TAU = Math.PI * 2;
   const key = new Set();
+  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
   let audio, last = 0, active = false, paused = false, muted = false, gameOver = false, score = 0, high = +(localStorage.asteroidsHigh || 0);
   let level = 0, lives = 3, ship, asteroids, bullets, enemyBullets, particles, ufo, ufoClock, respawnTimer, waveBanner, shake, stars;
 
   function resize() { const dpr = Math.min(devicePixelRatio || 1, 2); canvas.width = innerWidth * dpr; canvas.height = innerHeight * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0); buildStars(); }
-  function buildStars() { stars = Array.from({ length: Math.max(45, Math.floor(W() * H() / 11000)) }, () => ({ x: Math.random() * W(), y: Math.random() * H(), a: .15 + Math.random() * .5, s: Math.random() * 1.4 })); }
+  function buildStars() { stars = Array.from({ length: Math.max(35, Math.floor(W() * H() / (reduceMotion ? 18000 : 11000))) }, () => ({ x: Math.random() * W(), y: Math.random() * H(), a: .15 + Math.random() * .5, s: Math.random() * 1.4 })); }
   function wrap(o) { o.x = (o.x + W()) % W(); o.y = (o.y + H()) % H(); }
   function dist(a, b) { const dx = Math.abs(a.x - b.x), dy = Math.abs(a.y - b.y); return Math.hypot(Math.min(dx, W() - dx), Math.min(dy, H() - dy)); }
   function rand(min, max) { return min + Math.random() * (max - min); }
@@ -27,7 +28,7 @@
   function sound(name) { if (name === 'fire') tone(520, .055, 'square', .035, -280); if (name === 'boom') tone(100, .2, 'sawtooth', .07, -65); if (name === 'thrust') tone(60, .04, 'triangle', .018, 20); if (name === 'ufo') tone(290, .11, 'sine', .03, 80); if (name === 'hyper') tone(900, .16, 'sine', .05, -760); if (name === 'life') tone(760, .22, 'triangle', .05, 250); }
   function makeShip() { let x = W() / 2, y = H() / 2; for (let i = 0; i < 28 && asteroids?.some(a => Math.hypot(a.x - x, a.y - y) < a.r + 110); i++) { x = rand(80, W() - 80); y = rand(80, H() - 80); } return { x, y, vx: 0, vy: 0, a: -Math.PI / 2, r: 13, cool: 0, inv: 2.6, flame: 0 }; }
   function makeAsteroid(size, x = rand(0, W()), y = rand(0, H()), parent = null) { const r = [12, 23, 40][size], n = 8 + Math.floor(Math.random() * 5), shape = Array.from({ length: n }, () => r * rand(.7, 1.15)); const angle = Math.random() * TAU, speed = rand(18, 55) + level * 3; return { x, y, vx: (parent?.vx || 0) * .35 + Math.cos(angle) * speed, vy: (parent?.vy || 0) * .35 + Math.sin(angle) * speed, a: 0, spin: rand(-1.2, 1.2), size, r, shape }; }
-  function burst(x, y, count, color = '#baffdf') { for (let i = 0; i < count; i++) { const a = Math.random() * TAU, speed = rand(20, 160); particles.push({ x, y, vx: Math.cos(a) * speed, vy: Math.sin(a) * speed, life: rand(.25, .75), max: 1, color }); } }
+  function burst(x, y, count, color = '#baffdf') { for (let i = 0; i < (reduceMotion ? Math.ceil(count * .35) : count); i++) { const a = Math.random() * TAU, speed = rand(20, 160); particles.push({ x, y, vx: Math.cos(a) * speed, vy: Math.sin(a) * speed, life: rand(.25, .75), max: 1, color }); } }
   function newWave() { level++; waveBanner = 1.65; const count = Math.min(3 + level, 10); for (let i = 0; i < count; i++) { let x, y; do { x = rand(0, W()); y = rand(0, H()); } while (ship && Math.hypot(x - ship.x, y - ship.y) < 140); asteroids.push(makeAsteroid(2, x, y)); } ufoClock = rand(8, 15) / Math.min(1 + level * .04, 1.7); sound('life'); }
   function resetGame() { score = 0; level = 0; lives = 3; asteroids = []; bullets = []; enemyBullets = []; particles = []; ufo = null; shake = 0; ship = makeShip(); respawnTimer = 0; newWave(); }
   function start() { if (!audio) audio = new (window.AudioContext || window.webkitAudioContext)(); audio.resume(); resetGame(); active = true; paused = false; gameOver = false; overlay.classList.add('hidden'); }
@@ -42,7 +43,7 @@
       ship.cool -= dt; ship.inv -= dt; ship.hyper = Math.max(0, (ship.hyper || 0) - dt); ship.flame = 0;
       if (key.has('ArrowLeft') || key.has('KeyA')) ship.a -= 4.5 * dt;
       if (key.has('ArrowRight') || key.has('KeyD')) ship.a += 4.5 * dt;
-      if (key.has('ArrowUp') || key.has('KeyW')) { ship.vx += Math.cos(ship.a) * 235 * dt; ship.vy += Math.sin(ship.a) * 235 * dt; ship.flame = 1; if (Math.random() < .35) { const a = ship.a + Math.PI + rand(-.35, .35); particles.push({ x: ship.x - Math.cos(ship.a) * 10, y: ship.y - Math.sin(ship.a) * 10, vx: ship.vx * .25 + Math.cos(a) * rand(45, 95), vy: ship.vy * .25 + Math.sin(a) * rand(45, 95), life: .22, max: 1, color: '#ffcc80' }); } if (Math.random() < .15) sound('thrust'); }
+      if (key.has('ArrowUp') || key.has('KeyW')) { ship.vx += Math.cos(ship.a) * 235 * dt; ship.vy += Math.sin(ship.a) * 235 * dt; ship.flame = 1; if (!reduceMotion && Math.random() < .35) { const a = ship.a + Math.PI + rand(-.35, .35); particles.push({ x: ship.x - Math.cos(ship.a) * 10, y: ship.y - Math.sin(ship.a) * 10, vx: ship.vx * .25 + Math.cos(a) * rand(45, 95), vy: ship.vy * .25 + Math.sin(a) * rand(45, 95), life: .22, max: 1, color: '#ffcc80' }); } if (Math.random() < .15) sound('thrust'); }
       if ((key.has('Space') || key.has('KeyX')) && ship.cool <= 0) { shoot(); ship.cool = .19; }
       if (key.has('KeyH')) { key.delete('KeyH'); hyperspace(); }
       const speed = Math.hypot(ship.vx, ship.vy); if (speed > 310) { ship.vx *= 310 / speed; ship.vy *= 310 / speed; } ship.vx *= Math.pow(.985, dt * 60); ship.vy *= Math.pow(.985, dt * 60); ship.x += ship.vx * dt; ship.y += ship.vy * dt; wrap(ship);
@@ -54,7 +55,7 @@
     if (!ufo && level > 1 && (ufoClock -= dt) <= 0) { const dir = Math.random() < .5 ? 1 : -1; ufo = { x: dir > 0 ? -30 : W() + 30, y: rand(80, H() - 120), vx: dir * (78 + level * 2), vy: 0, r: level > 4 && Math.random() < .4 ? 12 : 18, cool: 1 }; sound('ufo'); }
     if (ufo) { ufo.x += ufo.vx * dt; ufo.y += Math.sin(performance.now() / 350) * 25 * dt; ufo.cool -= dt; if (ufo.cool < 0 && ship) { shoot(true); ufo.cool = rand(.8, 1.8); } if (ufo.x < -45 || ufo.x > W() + 45) ufo = null; }
     // Projectile-to-rock collision; splitting occurs only once per destroyed parent.
-    for (const b of bullets) for (const a of asteroids) if (b.life > 0 && a.dead !== true && dist(b, a) < a.r + b.r) { b.life = 0; a.dead = true; award([100, 50, 20][a.size]); burst(a.x, a.y, a.size === 2 ? 20 : 12); shake = Math.max(shake, a.size === 2 ? 1 : .45); sound('boom'); if (a.size) { asteroids.push(makeAsteroid(a.size - 1, a.x, a.y, a), makeAsteroid(a.size - 1, a.x, a.y, a)); } }
+    for (const b of bullets) for (const a of asteroids) if (b.life > 0 && a.dead !== true && dist(b, a) < a.r + b.r) { b.life = 0; a.dead = true; award([100, 50, 20][a.size]); burst(a.x, a.y, a.size === 2 ? 20 : 12); if (!reduceMotion) shake = Math.max(shake, a.size === 2 ? 1 : .45); sound('boom'); if (a.size) { asteroids.push(makeAsteroid(a.size - 1, a.x, a.y, a), makeAsteroid(a.size - 1, a.x, a.y, a)); } }
     asteroids = asteroids.filter(a => !a.dead);
     if (ufo) for (const b of bullets) if (b.life > 0 && dist(b, ufo) < ufo.r + b.r) { b.life = 0; award(ufo.r < 15 ? 1000 : 200); burst(ufo.x, ufo.y, 24, '#ffcc8e'); ufo = null; sound('boom'); }
     if (ship) { for (const a of asteroids) if (dist(ship, a) < ship.r + a.r * .72) loseShip(); for (const b of enemyBullets) if (dist(ship, b) < ship.r + b.r) loseShip(); if (ufo && dist(ship, ufo) < ship.r + ufo.r) loseShip(); }
