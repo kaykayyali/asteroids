@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#05090d" />
+    <title>ASTEROIDS // VECTOR DEFENSE</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main class="cabinet" aria-label="Asteroids arcade game">
+      <canvas id="game" aria-label="Asteroids game field"></canvas>
+      <section id="overlay" class="overlay" aria-live="polite">
+        <p class="eyebrow">ATARI-INSPIRED VECTOR ARCADE</p>
+        <h1 id="title">ASTEROIDS</h1>
+        <p id="message">Clear the drifting field. Don't get caught in the debris.</p>
+        <button id="action" type="button">START GAME</button>
+        <p class="help">← → ROTATE &nbsp; ↑ THRUST &nbsp; SPACE FIRE &nbsp; H HYPERSPACE</p>
+      </section>
+      <section class="touch-controls" aria-label="Touch controls">
+        <div class="touch-cluster">
+          <button class="touch" data-key="ArrowLeft" aria-label="Rotate left">◀</button>
+          <button class="touch" data-key="ArrowUp" aria-label="Thrust">▲</button>
+          <button class="touch" data-key="ArrowRight" aria-label="Rotate right">▶</button>
+        </div>
+        <div class="touch-cluster">
+          <button class="touch fire" data-key="Space" aria-label="Fire">FIRE</button>
+          <button class="touch" data-key="KeyH" aria-label="Hyperspace">HYPER</button>
+        </div>
+      </section>
+    </main>
+    <script src="game.js"></script>
+  </body>
+</html>

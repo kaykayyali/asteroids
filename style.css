@@ -1,0 +1,20 @@
+:root { color-scheme: dark; }
+* { box-sizing: border-box; }
+body { margin: 0; min-height: 100dvh; display: grid; place-items: center; overflow: hidden; background: radial-gradient(circle at 50% 20%, #10202a, #030507 65%); font-family: "Courier New", monospace; color: #e7fff5; }
+.cabinet { position: relative; width: min(100vw, 1100px); height: min(100dvh, 760px); min-height: 400px; overflow: hidden; background: #03080c; box-shadow: 0 0 45px #00e8b333, inset 0 0 50px #0a7c6430; }
+canvas { width: 100%; height: 100%; display: block; touch-action: none; }
+.overlay { position: absolute; inset: 0; z-index: 2; display: grid; justify-items: center; align-content: center; gap: 16px; padding: 25px; text-align: center; background: #020a0caa; transition: opacity .25s; }
+.overlay.hidden { opacity: 0; pointer-events: none; }
+h1 { margin: 0; color: #baffdf; font-size: clamp(2.9rem, 11vw, 7rem); line-height: .8; letter-spacing: .11em; text-shadow: 0 0 7px #29ffb8, 0 0 22px #00a879; }
+.eyebrow, .help { margin: 0; color: #7feac3; font-size: clamp(.65rem, 1.8vw, .9rem); letter-spacing: .12em; }
+#message { max-width: 420px; margin: 0; color: #d8fff1; line-height: 1.55; }
+#action, .touch { border: 1px solid #62f7c0; color: #d9fff1; background: #0d3d36cc; font: inherit; letter-spacing: .08em; cursor: pointer; box-shadow: 0 0 12px #00d59555; }
+#action { padding: 13px 25px; font-size: 1rem; }
+#action:hover, #action:focus-visible { background: #167464; outline: 2px solid #fff; outline-offset: 3px; }
+.touch-controls { position: absolute; z-index: 3; inset: auto 14px 14px; display: flex; justify-content: space-between; pointer-events: none; }
+.touch-cluster { display: flex; align-items: end; gap: 7px; pointer-events: auto; }
+.touch { width: 53px; height: 48px; border-radius: 8px; font-weight: bold; user-select: none; -webkit-user-select: none; touch-action: none; }
+.touch.fire { width: 70px; }
+.touch:active { transform: scale(.93); background: #1b806c; }
+@media (pointer: fine) and (min-width: 700px) { .touch-controls { opacity: .25; } .touch-controls:hover { opacity: 1; } }
+@media (max-height: 520px) { .overlay { gap: 8px; } .help { display: none; } }
