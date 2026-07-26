@@ -69,3 +69,7 @@ Added a file header and explicit sections for state, audio, lifecycle, physics/c
 ## 2026-07-26 — code-quality verification: lifecycle and narrow viewport
 
 Ran `node --check` over every JavaScript file and a whitespace/line-length check over all browser source files. Re-read `frame`, `startGame`, `resetGame`, and `resize`: exactly one animation loop and one set of input listeners are installed at boot; restart replaces state only; resize recalculates the DPR backing store, wraps every active entity, and rebuilds stars even when paused. Narrow-viewport CSS reduces button width/gaps below 440px, while pointer capture and cancellation handling preserve touch release behavior. No browser binary is installed here for a headless console pass.
+
+## 2026-07-26 — iteration 13: rapid-hit score combos
+
+Added a 1.8-second escalating asteroid-hit combo, capped at five times the base score, with a HUD readout. It rewards confidently clearing an active debris cluster rather than camping at the edge. I kept UFO rewards fixed so their high-value, intermittent role remains understandable.

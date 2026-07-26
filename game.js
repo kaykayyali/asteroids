@@ -37,6 +37,8 @@
   let waveBannerTimer = 0;
   let shake = 0;
   let stars = [];
+  let combo = 1;
+  let comboTimer = 0;
 
   const width = () => canvas.width / pixelRatio;
   const height = () => canvas.height / pixelRatio;
@@ -282,6 +284,8 @@
     particles = [];
     ufo = null;
     shake = 0;
+    combo = 1;
+    comboTimer = 0;
     ship = makeShip();
     respawnTimer = 0;
     newWave();
@@ -529,7 +533,9 @@
 
   function destroyAsteroid(asteroid) {
     asteroid.destroyed = true;
-    addScore([100, 50, 20][asteroid.size]);
+    addScore([100, 50, 20][asteroid.size] * combo);
+    combo = Math.min(5, combo + 1);
+    comboTimer = 1.8;
     burst(asteroid.x, asteroid.y, asteroid.size === 2 ? 20 : 12);
 
     if (!reduceMotion) {
@@ -609,6 +615,10 @@
     }
 
     waveBannerTimer -= deltaTime;
+    comboTimer -= deltaTime;
+    if (comboTimer <= 0) {
+      combo = 1;
+    }
     updateShip(deltaTime);
     updateAsteroids(deltaTime);
     updateProjectiles(deltaTime);
@@ -723,6 +733,14 @@
     ctx.fillText(`SCORE ${formatScore(score)}`, 20, 18);
     ctx.fillText(`HIGH ${formatScore(highScore)}`, Math.max(160, width() / 2 - 65), 18);
     ctx.fillText(`WAVE ${level}`, width() - 106, 18);
+
+    if (combo > 1 && comboTimer > 0) {
+      ctx.fillStyle = '#ffcc8e';
+      ctx.textAlign = 'center';
+      ctx.fillText(`COMBO x${combo - 1}`, width() / 2, 45);
+      ctx.textAlign = 'left';
+      ctx.fillStyle = '#baffdf';
+    }
 
     for (let index = 0; index < Math.max(0, lives); index += 1) {
       drawPath(
