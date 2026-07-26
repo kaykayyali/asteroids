@@ -13,6 +13,7 @@
   const message = document.querySelector('#message');
   const TAU = Math.PI * 2;
   const keys = new Set();
+  const suppressedStartKeys = new Set();
   const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // State lives in one closure so a restart can replace entities without adding listeners.
@@ -315,6 +316,10 @@
   }
 
   function startGame() {
+    if (active) {
+      return;
+    }
+
     if (!audioContext) {
       const AudioContext = window.AudioContext || window.webkitAudioContext;
       audioContext = new AudioContext();
@@ -325,6 +330,7 @@
     active = true;
     paused = false;
     overlay.classList.add('hidden');
+    canvas.focus({ preventScroll: true });
   }
 
   function endGame() {
@@ -338,6 +344,7 @@
     ].join('  •  ');
     actionButton.textContent = 'PLAY AGAIN';
     overlay.classList.remove('hidden');
+    focusActionButton();
   }
 
   function formatScore(value) {
@@ -900,6 +907,22 @@
       event.preventDefault();
     }
 
+    if (suppressedStartKeys.has(event.code)) {
+      return;
+    }
+
+    if (
+      !active &&
+      !event.repeat &&
+      (event.code === 'Space' || event.code === 'Enter')
+    ) {
+      // Keep the initiating press out of the gameplay key set until it is released.
+      suppressedStartKeys.add(event.code);
+      keys.clear();
+      startGame();
+      return;
+    }
+
     if (event.code === 'KeyP' && !event.repeat && active) {
       paused = !paused;
       keys.clear();
@@ -934,13 +957,24 @@
     });
   }
 
+  function focusActionButton() {
+    requestAnimationFrame(() => actionButton.focus({ preventScroll: true }));
+  }
+
   window.addEventListener('resize', resize);
   window.addEventListener('keydown', handleKeyDown);
-  window.addEventListener('keyup', event => keys.delete(event.code));
-  window.addEventListener('blur', () => keys.clear());
+  window.addEventListener('keyup', event => {
+    keys.delete(event.code);
+    suppressedStartKeys.delete(event.code);
+  });
+  window.addEventListener('blur', () => {
+    keys.clear();
+    suppressedStartKeys.clear();
+  });
   actionButton.addEventListener('click', startGame);
 
   bindTouchControls();
   resize();
+  focusActionButton();
   requestAnimationFrame(frame);
 })();

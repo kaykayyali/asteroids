@@ -95,3 +95,7 @@ From wave four onward, 12% of hyperspace jumps become unstable: they select an u
 Re-ran JavaScript syntax validation, source line-length checks, and whitespace validation after the five additional gameplay passes. I also re-read the single RAF ownership, restart replacement path, resize wrapping path, and pointer-captured touch bindings; they remain independent of the new score, timing, and hyperspace state.
 
 Considered and rejected: power-up drops (would move away from Asteroids' pure ship-versus-field loop), a boss encounter (changes the arcade game's primary threat model), permanent ship upgrades (weakens score-driven replayability), online leaderboards (breaks standalone use), and a more punitive hyperspace failure rate (would make recovery feel arbitrary). The implemented additions cover scoring depth, enemy skill, pacing, input/audio feel, and a classic risk tradeoff without undermining the original game.
+
+## 2026-07-26 — accessibility fix: keyboard start and restart
+
+Space and Enter now begin a new game from either the start or Game Over screen. The starting key is suppressed through keyup, including key-repeat events, so it cannot cause an immediate shot or reinitialize a running game. The native action button retains normal focus/activation behavior, receives focus on load and Game Over, and focus moves to the labelled canvas once play begins. I rejected installing a second, overlay-specific listener because the single global input path is easier to reason about across restarts.
