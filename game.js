@@ -44,6 +44,7 @@
   let clearBonus = 0;
   let clearBonusTimer = 0;
   let hyperspaceWarningTimer = 0;
+  let idleAsteroids = [];
 
   const width = () => canvas.width / pixelRatio;
   const height = () => canvas.height / pixelRatio;
@@ -111,9 +112,14 @@
       ...bullets,
       ...enemyBullets,
       ...particles,
+      ...idleAsteroids,
     ];
     entities.filter(Boolean).forEach(wrap);
     buildStars();
+
+    if (idleAsteroids.length === 0) {
+      buildIdleAsteroids();
+    }
   }
 
   function buildStars() {
@@ -126,6 +132,16 @@
       alpha: 0.15 + Math.random() * 0.5,
       size: Math.random() * 1.4,
     }));
+  }
+
+  function buildIdleAsteroids() {
+    idleAsteroids = Array.from({ length: 4 }, () => {
+      const asteroid = makeAsteroid(2);
+      asteroid.vx *= 0.28;
+      asteroid.vy *= 0.28;
+      asteroid.spin *= 0.3;
+      return asteroid;
+    });
   }
 
   // Audio --------------------------------------------------------------------
@@ -680,6 +696,15 @@
     shake = Math.max(0, shake - deltaTime * 3);
   }
 
+  function updateAttractMode(deltaTime) {
+    idleAsteroids.forEach(asteroid => {
+      asteroid.x += asteroid.vx * deltaTime;
+      asteroid.y += asteroid.vy * deltaTime;
+      asteroid.angle += asteroid.spin * deltaTime;
+      wrap(asteroid);
+    });
+  }
+
   // Rendering ----------------------------------------------------------------
   // Vector paths are redrawn every frame so the glow remains crisp at any device scale.
   function drawPath(points, x, y, angle = 0, close = true) {
@@ -867,6 +892,11 @@
     ctx.lineWidth = 1.7;
     ctx.shadowColor = '#18e4a5';
     ctx.shadowBlur = 5;
+
+    if (!active) {
+      idleAsteroids.forEach(drawAsteroid);
+    }
+
     asteroids.forEach(drawAsteroid);
 
     if (ufo) {
@@ -897,7 +927,13 @@
     // Cap simulation time after a tab stall so objects cannot tunnel through each other.
     const deltaTime = Math.min(0.033, (now - lastFrameTime) / 1000 || 0);
     lastFrameTime = now;
-    update(deltaTime, now);
+
+    if (active) {
+      update(deltaTime, now);
+    } else {
+      updateAttractMode(deltaTime);
+    }
+
     draw();
     requestAnimationFrame(frame);
   }

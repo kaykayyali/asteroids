@@ -99,3 +99,7 @@ Considered and rejected: power-up drops (would move away from Asteroids' pure sh
 ## 2026-07-26 — accessibility fix: keyboard start and restart
 
 Space and Enter now begin a new game from either the start or Game Over screen. The starting key is suppressed through keyup, including key-repeat events, so it cannot cause an immediate shot or reinitialize a running game. The native action button retains normal focus/activation behavior, receives focus on load and Game Over, and focus moves to the labelled canvas once play begins. I rejected installing a second, overlay-specific listener because the single global input path is easier to reason about across restarts.
+
+## 2026-07-26 — presentation fix: attract-mode idle motion
+
+Added four slow vector asteroids behind inactive overlays. They evolve through the already-owned animation frame rather than a second timer, so the start/Game Over presentation visibly demonstrates a live 60fps canvas without affecting gameplay state or restart behavior. I kept the count low to leave the title legible and rejected animated UI text because moving type is less useful than showing the actual playfield's motion.
