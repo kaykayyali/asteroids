@@ -57,3 +57,7 @@ All active entities now wrap immediately after a viewport resize, including whil
 Verified the final JavaScript with `node --check game.js`; no headless browser is installed in this environment for an automated console pass. The game is intentionally dependency-free and uses only browser-native Canvas, input, storage, and Web Audio APIs, so opening `index.html` remains the complete runtime path.
 
 I considered and rejected: multiplayer/network scoreboards (would break the standalone design), an external asset pack (contrary to synthesized/vector presentation), procedural missions (would dilute the focused arcade loop), a settings panel (would overcrowd the cabinet UI), stronger UFO homing (less fair/readable), unlimited late-wave asteroid count (poor performance/readability), and a build tool/framework (unnecessary surface area). The remaining ideas are stylistic variants rather than meaningful improvements to the requested 1979 Asteroids loop.
+
+## 2026-07-26 — code-quality refactor: readable source layout
+
+Replaced the compressed source with conventionally formatted HTML, CSS, and JavaScript. The game state and update/render responsibilities are now separated into named functions, every source line is at or below 100 characters, and narrow screens receive appropriately smaller touch controls. Pointer capture was added so touch presses release reliably even if a finger leaves its original button. This deliberately preserves the existing game rules; documentation is added in the following commit so the formatting diff remains reviewable on its own.
