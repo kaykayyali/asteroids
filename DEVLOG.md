@@ -7,3 +7,7 @@ Built the standalone Canvas game: vector ship physics, toroidal movement, three-
 ## 2026-07-26 — iteration 1: impactful fragmentation
 
 Fragment velocities now inherit a controlled share of their parent rock's momentum, which makes a hit read as a split rather than two unrelated spawns. Large impacts add a very short canvas shake. I rejected longer camera movement because it would obscure the intentionally precise vector controls.
+
+## 2026-07-26 — iteration 2: safer re-entry
+
+Ship spawning now samples a clear location when debris occupies the center rather than relying only on invulnerability. This avoids a frustrating respawn directly inside a large rock while retaining the short visual re-entry grace period. I kept the central spawn as the first choice for predictability.
